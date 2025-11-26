@@ -1,549 +1,638 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.List;
+import java.util.Scanner;
 
+/**
+ * Library Management System - Main Application
+ * A comprehensive system for managing books, students, and borrowing records
+ */
 public class App {
-    // Simple in-memory storage for demo purposes
-    private static Map<String, Account> accounts = new HashMap<>();
-    private static String currentAccountNumber = null;
+    private static LibraryManager libraryManager;
+    private static Scanner scanner = new Scanner(System.in);
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new WelcomeFrame());
-    }
-    
-    public static Map<String, Account> getAccounts() {
-        return accounts;
-    }
-    
-    public static void setCurrentAccount(String accountNumber) {
-        currentAccountNumber = accountNumber;
-    }
-    
-    public static String getCurrentAccount() {
-        return currentAccountNumber;
-    }
-}
-
-class Account {
-    private String accountNumber;
-    private String name;
-    private String email;
-    private String mobile;
-    private String gender;
-    private String address;
-    private String dob;
-    private String accountType;
-    private String maritalStatus;
-    private double balance;
-    private String pin;
-    
-    public Account(String accountNumber, String name, String email, String mobile, 
-                  String gender, String address, String dob, String accountType, 
-                  String maritalStatus) {
-        this.accountNumber = accountNumber;
-        this.name = name;
-        this.email = email;
-        this.mobile = mobile;
-        this.gender = gender;
-        this.address = address;
-        this.dob = dob;
-        this.accountType = accountType;
-        this.maritalStatus = maritalStatus;
-        this.balance = 1000.0; // Starting balance
-        this.pin = generateRandomPin();
-    }
-    
-    private String generateRandomPin() {
-        Random rand = new Random();
-        return String.format("%04d", rand.nextInt(10000));
-    }
-    
-    // Getters and setters
-    public String getAccountNumber() { return accountNumber; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
-    public String getMobile() { return mobile; }
-    public String getGender() { return gender; }
-    public String getAddress() { return address; }
-    public String getDob() { return dob; }
-    public String getAccountType() { return accountType; }
-    public String getMaritalStatus() { return maritalStatus; }
-    public double getBalance() { return balance; }
-    public String getPin() { return pin; }
-    
-    public void setBalance(double balance) { this.balance = balance; }
-    public void setPin(String pin) { this.pin = pin; }
-    
-    public boolean withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-            return true;
-        }
-        return false;
-    }
-    
-    public void deposit(double amount) {
-        if (amount > 0) {
-            balance += amount;
-        }
-    }
-}
-
-class WelcomeFrame extends JFrame {
-    public WelcomeFrame() {
-        setTitle("Welcome to Chota ATM");
-        setSize(500, 400);
-        setLocationRelativeTo(null); // Center the window
-        setLayout(new BorderLayout());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        // Title panel
-        JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel("Chota ATM System", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titlePanel.add(titleLabel);
+        System.out.println("=================================");
+        System.out.println("   LIBRARY MANAGEMENT SYSTEM    ");
+        System.out.println("=================================");
         
-        // Button panel
-        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        // Initialize the library manager
+        libraryManager = LibraryManager.getInstance();
         
-        JButton createAccBtn = new JButton("Create Account");
-        JButton viewInfoBtn = new JButton("View Info");
-        JButton openATMBtn = new JButton("Open ATM");
-        JButton cardDetailsBtn = new JButton("Card Details");
+        // Add some sample data for testing
+        initializeSampleData();
         
-        // Style buttons
-        Font buttonFont = new Font("Arial", Font.PLAIN, 16);
-        createAccBtn.setFont(buttonFont);
-        viewInfoBtn.setFont(buttonFont);
-        openATMBtn.setFont(buttonFont);
-        cardDetailsBtn.setFont(buttonFont);
-
-        buttonPanel.add(createAccBtn);
-        buttonPanel.add(viewInfoBtn);
-        buttonPanel.add(openATMBtn);
-        buttonPanel.add(cardDetailsBtn);
-        
-        add(titlePanel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.CENTER);
-
-        createAccBtn.addActionListener(e -> new CreateAccountFrame());
-        viewInfoBtn.addActionListener(e -> new ViewInfoFrame());
-        openATMBtn.addActionListener(e -> new LoginFrame());
-        cardDetailsBtn.addActionListener(e -> new CardDetailsFrame());
-
-        setVisible(true);
-    }
-}
-
-class CreateAccountFrame extends JFrame {
-    public CreateAccountFrame() {
-        setTitle("Create Account");
-        setSize(500, 500);
-        setLocationRelativeTo(null);
-        setLayout(new GridLayout(11, 2, 5, 10));
-        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JTextField name = new JTextField();
-        JTextField email = new JTextField();
-        JTextField mobile = new JTextField();
-        JRadioButton male = new JRadioButton("Male"), female = new JRadioButton("Female");
-        ButtonGroup genderGroup = new ButtonGroup(); 
-        genderGroup.add(male); 
-        genderGroup.add(female);
-        JTextField address = new JTextField();
-        JTextField dob = new JTextField();
-        JComboBox<String> accType = new JComboBox<>(new String[]{"Savings", "Current"});
-        JComboBox<String> maritalStatus = new JComboBox<>(new String[]{"Single", "Married"});
-
-        add(new JLabel("Full Name:")); add(name);
-        add(new JLabel("Email:")); add(email);
-        add(new JLabel("Mobile No:")); add(mobile);
-        add(new JLabel("Gender:")); 
-        JPanel genderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        genderPanel.add(male); genderPanel.add(female);
-        add(genderPanel);
-        add(new JLabel("Address:")); add(address);
-        add(new JLabel("DOB (DD/MM/YYYY):")); add(dob);
-        add(new JLabel("Account Type:")); add(accType);
-        add(new JLabel("Marital Status:")); add(maritalStatus);
-        add(new JLabel(""));
-        add(new JLabel(""));
-
-        JButton submit = new JButton("Submit"), exit = new JButton("Exit");
-        add(submit); add(exit);
-
-        exit.addActionListener(e -> dispose());
-        submit.addActionListener(e -> {
-            if (validateInput(name, email, mobile, genderGroup, address, dob)) {
-                String accountNumber = generateAccountNumber();
-                String gender = male.isSelected() ? "Male" : "Female";
-                
-                Account account = new Account(
-                    accountNumber,
-                    name.getText().trim(),
-                    email.getText().trim(),
-                    mobile.getText().trim(),
-                    gender,
-                    address.getText().trim(),
-                    dob.getText().trim(),
-                    (String) accType.getSelectedItem(),
-                    (String) maritalStatus.getSelectedItem()
-                );
-                
-                App.getAccounts().put(accountNumber, account);
-                
-                JOptionPane.showMessageDialog(this, 
-                    "Account Created Successfully!\n" +
-                    "Account Number: " + accountNumber + "\n" +
-                    "PIN: " + account.getPin() + "\n" +
-                    "Initial Balance: $" + account.getBalance(),
-                    "Account Created", JOptionPane.INFORMATION_MESSAGE);
-                dispose();
-            }
-        });
-
-        setVisible(true);
-    }
-    
-    private boolean validateInput(JTextField name, JTextField email, JTextField mobile, 
-                                ButtonGroup genderGroup, JTextField address, JTextField dob) {
-        if (name.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your full name.");
-            return false;
-        }
-        if (email.getText().trim().isEmpty() || !email.getText().contains("@")) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid email address.");
-            return false;
-        }
-        if (mobile.getText().trim().isEmpty() || mobile.getText().trim().length() < 10) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid mobile number (at least 10 digits).");
-            return false;
-        }
-        if (genderGroup.getSelection() == null) {
-            JOptionPane.showMessageDialog(this, "Please select your gender.");
-            return false;
-        }
-        if (address.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your address.");
-            return false;
-        }
-        if (dob.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your date of birth.");
-            return false;
-        }
-        return true;
-    }
-    
-    private String generateAccountNumber() {
-        Random rand = new Random();
-        return "ACC" + String.format("%06d", rand.nextInt(1000000));
-    }
-}
-
-class ATMMenuFrame extends JFrame {
-    private Account currentAccount;
-    
-    public ATMMenuFrame(Account account) {
-        this.currentAccount = account;
-        setTitle("ATM Menu - Welcome " + account.getName());
-        setSize(500, 400);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
-        
-        // Welcome panel
-        JPanel welcomePanel = new JPanel();
-        JLabel welcomeLabel = new JLabel("Welcome, " + account.getName(), SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        welcomePanel.add(welcomeLabel);
-        
-        // Button panel
-        JPanel buttonPanel = new JPanel(new GridLayout(3, 2, 15, 15));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
-
-        JButton balanceBtn = new JButton("Balance Enquiry");
-        JButton withdrawBtn = new JButton("Withdraw");
-        JButton depositBtn = new JButton("Deposit");
-        JButton pinBtn = new JButton("Change PIN");
-        JButton fundBtn = new JButton("Fund Transfer");
-        JButton cancelBtn = new JButton("Logout");
-        
-        // Style buttons
-        Font buttonFont = new Font("Arial", Font.PLAIN, 14);
-        balanceBtn.setFont(buttonFont);
-        withdrawBtn.setFont(buttonFont);
-        depositBtn.setFont(buttonFont);
-        pinBtn.setFont(buttonFont);
-        fundBtn.setFont(buttonFont);
-        cancelBtn.setFont(buttonFont);
-
-        buttonPanel.add(balanceBtn); buttonPanel.add(withdrawBtn);
-        buttonPanel.add(depositBtn); buttonPanel.add(pinBtn);
-        buttonPanel.add(fundBtn); buttonPanel.add(cancelBtn);
-        
-        add(welcomePanel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.CENTER);
-
-        // Add action listeners
-        balanceBtn.addActionListener(e -> showBalance());
-        withdrawBtn.addActionListener(e -> withdraw());
-        depositBtn.addActionListener(e -> deposit());
-        pinBtn.addActionListener(e -> changePin());
-        fundBtn.addActionListener(e -> fundTransfer());
-        cancelBtn.addActionListener(e -> {
-            App.setCurrentAccount(null);
-            dispose();
-            new WelcomeFrame();
-        });
-
-        setVisible(true);
-    }
-    
-    private void showBalance() {
-        JOptionPane.showMessageDialog(this, 
-            "Account Number: " + currentAccount.getAccountNumber() + "\n" +
-            "Current Balance: $" + String.format("%.2f", currentAccount.getBalance()),
-            "Balance Enquiry", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    private void withdraw() {
-        String amountStr = JOptionPane.showInputDialog(this, "Enter amount to withdraw:");
-        if (amountStr != null && !amountStr.trim().isEmpty()) {
-            try {
-                double amount = Double.parseDouble(amountStr);
-                if (currentAccount.withdraw(amount)) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Withdrawal Successful!\n" +
-                        "Amount Withdrawn: $" + String.format("%.2f", amount) + "\n" +
-                        "Remaining Balance: $" + String.format("%.2f", currentAccount.getBalance()));
-                } else {
-                    JOptionPane.showMessageDialog(this, "Insufficient balance or invalid amount!", 
-                        "Error", JOptionPane.ERROR_MESSAGE);
+        // Run the main menu loop
+        boolean running = true;
+        while (running) {
+            displayMainMenu();
+            int choice = getIntInput("Enter your choice: ");
+            
+            switch (choice) {
+                case 1 -> manageStudents();
+                case 2 -> manageBooks();
+                case 3 -> manageBorrowing();
+                case 4 -> viewReports();
+                case 5 -> searchSystem();
+                case 0 -> {
+                    System.out.println("Shutting down Library Management System...");
+                    libraryManager.shutdown();
+                    running = false;
                 }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid amount!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        
+        scanner.close();
+        System.out.println("Thank you for using Library Management System!");
+    }
+    
+    private static void displayMainMenu() {
+        System.out.println("\n========== MAIN MENU ==========");
+        System.out.println("1. Manage Students");
+        System.out.println("2. Manage Books");
+        System.out.println("3. Borrowing & Returns");
+        System.out.println("4. Reports & Statistics");
+        System.out.println("5. Search System");
+        System.out.println("0. Exit");
+        System.out.println("===============================");
+    }
+    
+    // Student Management
+    private static void manageStudents() {
+        while (true) {
+            System.out.println("\n===== STUDENT MANAGEMENT =====");
+            System.out.println("1. Add Student");
+            System.out.println("2. View All Students");
+            System.out.println("3. Update Student");
+            System.out.println("4. Remove Student");
+            System.out.println("5. View Student Details");
+            System.out.println("0. Back to Main Menu");
+            System.out.println("===============================");
+            
+            int choice = getIntInput("Enter your choice: ");
+            
+            switch (choice) {
+                case 1 -> addStudent();
+                case 2 -> viewAllStudents();
+                case 3 -> updateStudent();
+                case 4 -> removeStudent();
+                case 5 -> viewStudentDetails();
+                case 0 -> { return; }
+                default -> System.out.println("Invalid choice. Please try again.");
             }
         }
     }
     
-    private void deposit() {
-        String amountStr = JOptionPane.showInputDialog(this, "Enter amount to deposit:");
-        if (amountStr != null && !amountStr.trim().isEmpty()) {
+    private static void addStudent() {
+        System.out.println("\n--- Add New Student ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        System.out.print("Enter Student Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter Email: ");
+        String email = scanner.nextLine();
+        System.out.print("Enter Address: ");
+        String address = scanner.nextLine();
+        System.out.print("Enter Phone Number: ");
+        String phone = scanner.nextLine();
+        
+        if (libraryManager.addStudent(studentId, name, email, address, phone)) {
+            System.out.println("✅ Student added successfully!");
+        } else {
+            System.out.println("❌ Failed to add student. Check if ID already exists.");
+        }
+    }
+    
+    private static void viewAllStudents() {
+        System.out.println("\n--- All Students ---");
+        List<Student> students = libraryManager.getAllStudents();
+        
+        if (students.isEmpty()) {
+            System.out.println("No students found.");
+        } else {
+            System.out.printf("%-10s %-20s %-25s %-15s %-10s%n", 
+                            "ID", "Name", "Email", "Phone", "Books");
+            System.out.println("=".repeat(85));
+            
+            for (Student student : students) {
+                System.out.printf("%-10s %-20s %-25s %-15s %-10s%n",
+                                student.getStudentId(),
+                                student.getStudentName(),
+                                student.getEmail(),
+                                student.getPhoneNumber() != null ? student.getPhoneNumber() : "N/A",
+                                student.getCurrentBorrowCount() + "/" + student.getMaxBorrowLimit());
+            }
+        }
+    }
+    
+    private static void updateStudent() {
+        System.out.println("\n--- Update Student ---");
+        System.out.print("Enter Student ID to update: ");
+        String studentId = scanner.nextLine();
+        
+        Student existingStudent = libraryManager.getStudent(studentId);
+        if (existingStudent == null) {
+            System.out.println("❌ Student not found.");
+            return;
+        }
+        
+        System.out.println("Current details: " + existingStudent);
+        System.out.print("Enter new name (current: " + existingStudent.getStudentName() + "): ");
+        String name = scanner.nextLine();
+        if (name.trim().isEmpty()) name = existingStudent.getStudentName();
+        
+        System.out.print("Enter new email (current: " + existingStudent.getEmail() + "): ");
+        String email = scanner.nextLine();
+        if (email.trim().isEmpty()) email = existingStudent.getEmail();
+        
+        System.out.print("Enter new address (current: " + existingStudent.getAddress() + "): ");
+        String address = scanner.nextLine();
+        if (address.trim().isEmpty()) address = existingStudent.getAddress();
+        
+        System.out.print("Enter new phone (current: " + existingStudent.getPhoneNumber() + "): ");
+        String phone = scanner.nextLine();
+        if (phone.trim().isEmpty()) phone = existingStudent.getPhoneNumber();
+        
+        if (libraryManager.updateStudent(studentId, name, email, address, phone)) {
+            System.out.println("✅ Student updated successfully!");
+        } else {
+            System.out.println("❌ Failed to update student.");
+        }
+    }
+    
+    private static void removeStudent() {
+        System.out.println("\n--- Remove Student ---");
+        System.out.print("Enter Student ID to remove: ");
+        String studentId = scanner.nextLine();
+        
+        Student student = libraryManager.getStudent(studentId);
+        if (student == null) {
+            System.out.println("❌ Student not found.");
+            return;
+        }
+        
+        System.out.println("Student to remove: " + student);
+        System.out.print("Are you sure you want to remove this student? (yes/no): ");
+        String confirmation = scanner.nextLine();
+        
+        if (confirmation.equalsIgnoreCase("yes")) {
+            if (libraryManager.removeStudent(studentId)) {
+                System.out.println("✅ Student removed successfully!");
+            } else {
+                System.out.println("❌ Failed to remove student. Check if they have unreturned books.");
+            }
+        } else {
+            System.out.println("Operation cancelled.");
+        }
+    }
+    
+    private static void viewStudentDetails() {
+        System.out.println("\n--- Student Details ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        
+        Student student = libraryManager.getStudent(studentId);
+        if (student == null) {
+            System.out.println("❌ Student not found.");
+            return;
+        }
+        
+        System.out.println("\n" + student);
+        
+        // Show borrowing history
+        List<BorrowRecord> history = libraryManager.getBorrowHistory(studentId);
+        if (!history.isEmpty()) {
+            System.out.println("\nBorrowing History:");
+            System.out.printf("%-15s %-12s %-12s %-12s %-8s %-8s%n", 
+                            "Book ID", "Borrow Date", "Due Date", "Return Date", "Returned", "Fine");
+            System.out.println("=".repeat(75));
+            
+            for (BorrowRecord record : history) {
+                System.out.printf("%-15s %-12s %-12s %-12s %-8s $%-7.2f%n",
+                                record.getBookId(),
+                                record.getFormattedBorrowDate(),
+                                record.getFormattedDueDate(),
+                                record.getFormattedReturnDate(),
+                                record.isReturned() ? "Yes" : "No",
+                                record.getFineAmount());
+            }
+        }
+    }
+    
+    // Book Management
+    private static void manageBooks() {
+        while (true) {
+            System.out.println("\n===== BOOK MANAGEMENT =====");
+            System.out.println("1. Add Book");
+            System.out.println("2. View All Books");
+            System.out.println("3. Update Book");
+            System.out.println("4. Remove Book");
+            System.out.println("5. View Available Books");
+            System.out.println("0. Back to Main Menu");
+            System.out.println("============================");
+            
+            int choice = getIntInput("Enter your choice: ");
+            
+            switch (choice) {
+                case 1 -> addBook();
+                case 2 -> viewAllBooks();
+                case 3 -> updateBook();
+                case 4 -> removeBook();
+                case 5 -> viewAvailableBooks();
+                case 0 -> { return; }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    
+    private static void addBook() {
+        System.out.println("\n--- Add New Book ---");
+        System.out.print("Enter Book ID: ");
+        String bookId = scanner.nextLine();
+        System.out.print("Enter Title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter Author: ");
+        String author = scanner.nextLine();
+        System.out.print("Enter ISBN: ");
+        String isbn = scanner.nextLine();
+        System.out.print("Enter Genre: ");
+        String genre = scanner.nextLine();
+        int copies = getIntInput("Enter number of copies: ");
+        
+        if (libraryManager.addBook(bookId, title, author, isbn, genre, copies)) {
+            System.out.println("✅ Book added successfully!");
+        } else {
+            System.out.println("❌ Failed to add book. Check if ID already exists.");
+        }
+    }
+    
+    private static void viewAllBooks() {
+        System.out.println("\n--- All Books ---");
+        List<Book> books = libraryManager.getAllBooks();
+        
+        if (books.isEmpty()) {
+            System.out.println("No books found.");
+        } else {
+            System.out.printf("%-10s %-25s %-20s %-15s %-15s %-10s%n", 
+                            "ID", "Title", "Author", "Genre", "ISBN", "Available");
+            System.out.println("=".repeat(100));
+            
+            for (Book book : books) {
+                System.out.printf("%-10s %-25s %-20s %-15s %-15s %-10s%n",
+                                book.getBookId(),
+                                truncate(book.getTitle(), 25),
+                                truncate(book.getAuthor(), 20),
+                                truncate(book.getGenre(), 15),
+                                book.getIsbn(),
+                                book.getAvailableCopies() + "/" + book.getTotalCopies());
+            }
+        }
+    }
+    
+    private static void updateBook() {
+        System.out.println("\n--- Update Book ---");
+        System.out.print("Enter Book ID to update: ");
+        String bookId = scanner.nextLine();
+        
+        Book existingBook = libraryManager.getBook(bookId);
+        if (existingBook == null) {
+            System.out.println("❌ Book not found.");
+            return;
+        }
+        
+        System.out.println("Current details: " + existingBook);
+        System.out.print("Enter new title (current: " + existingBook.getTitle() + "): ");
+        String title = scanner.nextLine();
+        if (title.trim().isEmpty()) title = existingBook.getTitle();
+        
+        System.out.print("Enter new author (current: " + existingBook.getAuthor() + "): ");
+        String author = scanner.nextLine();
+        if (author.trim().isEmpty()) author = existingBook.getAuthor();
+        
+        System.out.print("Enter new ISBN (current: " + existingBook.getIsbn() + "): ");
+        String isbn = scanner.nextLine();
+        if (isbn.trim().isEmpty()) isbn = existingBook.getIsbn();
+        
+        System.out.print("Enter new genre (current: " + existingBook.getGenre() + "): ");
+        String genre = scanner.nextLine();
+        if (genre.trim().isEmpty()) genre = existingBook.getGenre();
+        
+        System.out.print("Enter new total copies (current: " + existingBook.getTotalCopies() + "): ");
+        String copiesStr = scanner.nextLine();
+        int copies = copiesStr.trim().isEmpty() ? existingBook.getTotalCopies() : Integer.parseInt(copiesStr);
+        
+        if (libraryManager.updateBook(bookId, title, author, isbn, genre, copies)) {
+            System.out.println("✅ Book updated successfully!");
+        } else {
+            System.out.println("❌ Failed to update book.");
+        }
+    }
+    
+    private static void removeBook() {
+        System.out.println("\n--- Remove Book ---");
+        System.out.print("Enter Book ID to remove: ");
+        String bookId = scanner.nextLine();
+        
+        Book book = libraryManager.getBook(bookId);
+        if (book == null) {
+            System.out.println("❌ Book not found.");
+            return;
+        }
+        
+        System.out.println("Book to remove: " + book);
+        System.out.print("Are you sure you want to remove this book? (yes/no): ");
+        String confirmation = scanner.nextLine();
+        
+        if (confirmation.equalsIgnoreCase("yes")) {
+            if (libraryManager.removeBook(bookId)) {
+                System.out.println("✅ Book removed successfully!");
+            } else {
+                System.out.println("❌ Failed to remove book. Check if copies are currently borrowed.");
+            }
+        } else {
+            System.out.println("Operation cancelled.");
+        }
+    }
+    
+    private static void viewAvailableBooks() {
+        System.out.println("\n--- Available Books ---");
+        List<Book> books = libraryManager.getAvailableBooks();
+        
+        if (books.isEmpty()) {
+            System.out.println("No books available for borrowing.");
+        } else {
+            System.out.printf("%-10s %-25s %-20s %-15s %-10s%n", 
+                            "ID", "Title", "Author", "Genre", "Available");
+            System.out.println("=".repeat(85));
+            
+            for (Book book : books) {
+                System.out.printf("%-10s %-25s %-20s %-15s %-10s%n",
+                                book.getBookId(),
+                                truncate(book.getTitle(), 25),
+                                truncate(book.getAuthor(), 20),
+                                truncate(book.getGenre(), 15),
+                                book.getAvailableCopies());
+            }
+        }
+    }
+    
+    // Borrowing Management
+    private static void manageBorrowing() {
+        while (true) {
+            System.out.println("\n===== BORROWING & RETURNS =====");
+            System.out.println("1. Borrow Book");
+            System.out.println("2. Return Book");
+            System.out.println("3. Renew Book");
+            System.out.println("4. View Overdue Books");
+            System.out.println("5. View Student's Borrowed Books");
+            System.out.println("0. Back to Main Menu");
+            System.out.println("================================");
+            
+            int choice = getIntInput("Enter your choice: ");
+            
+            switch (choice) {
+                case 1 -> borrowBook();
+                case 2 -> returnBook();
+                case 3 -> renewBook();
+                case 4 -> viewOverdueBooks();
+                case 5 -> viewStudentBorrowedBooks();
+                case 0 -> { return; }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    
+    private static void borrowBook() {
+        System.out.println("\n--- Borrow Book ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        System.out.print("Enter Book ID: ");
+        String bookId = scanner.nextLine();
+        
+        String result = libraryManager.borrowBook(studentId, bookId);
+        System.out.println(result.startsWith("Success") ? "✅ " + result : "❌ " + result);
+    }
+    
+    private static void returnBook() {
+        System.out.println("\n--- Return Book ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        System.out.print("Enter Book ID: ");
+        String bookId = scanner.nextLine();
+        
+        String result = libraryManager.returnBook(studentId, bookId);
+        System.out.println(result.startsWith("Success") ? "✅ " + result : "❌ " + result);
+    }
+    
+    private static void renewBook() {
+        System.out.println("\n--- Renew Book ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        System.out.print("Enter Book ID: ");
+        String bookId = scanner.nextLine();
+        int additionalDays = getIntInput("Enter additional days (default 14): ");
+        if (additionalDays <= 0) additionalDays = 14;
+        
+        String result = libraryManager.renewBook(studentId, bookId, additionalDays);
+        System.out.println(result.startsWith("Success") ? "✅ " + result : "❌ " + result);
+    }
+    
+    private static void viewOverdueBooks() {
+        System.out.println("\n--- Overdue Books ---");
+        List<BorrowRecord> overdueBooks = libraryManager.getOverdueBooks();
+        
+        if (overdueBooks.isEmpty()) {
+            System.out.println("No overdue books found.");
+        } else {
+            System.out.printf("%-15s %-15s %-12s %-12s %-10s %-8s%n", 
+                            "Student ID", "Book ID", "Due Date", "Days Late", "Fine", "Status");
+            System.out.println("=".repeat(80));
+            
+            for (BorrowRecord record : overdueBooks) {
+                System.out.printf("%-15s %-15s %-12s %-12d $%-8.2f %-8s%n",
+                                record.getStudentId(),
+                                record.getBookId(),
+                                record.getFormattedDueDate(),
+                                record.getDaysOverdue(),
+                                record.getFineAmount(),
+                                "Overdue");
+            }
+        }
+    }
+    
+    private static void viewStudentBorrowedBooks() {
+        System.out.println("\n--- Student's Borrowed Books ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        
+        List<BorrowRecord> activeRecords = libraryManager.getActiveBorrowRecords(studentId);
+        
+        if (activeRecords.isEmpty()) {
+            System.out.println("No books currently borrowed by this student.");
+        } else {
+            System.out.printf("%-15s %-12s %-12s %-8s%n", 
+                            "Book ID", "Borrow Date", "Due Date", "Status");
+            System.out.println("=".repeat(50));
+            
+            for (BorrowRecord record : activeRecords) {
+                String status = record.isOverdue() ? "OVERDUE" : "OK";
+                System.out.printf("%-15s %-12s %-12s %-8s%n",
+                                record.getBookId(),
+                                record.getFormattedBorrowDate(),
+                                record.getFormattedDueDate(),
+                                status);
+            }
+        }
+    }
+    
+    // Reports and Statistics
+    private static void viewReports() {
+        while (true) {
+            System.out.println("\n===== REPORTS & STATISTICS =====");
+            System.out.println("1. Library Statistics");
+            System.out.println("2. Student Report");
+            System.out.println("3. Book Report");
+            System.out.println("4. Overdue Report");
+            System.out.println("0. Back to Main Menu");
+            System.out.println("=================================");
+            
+            int choice = getIntInput("Enter your choice: ");
+            
+            switch (choice) {
+                case 1 -> showLibraryStatistics();
+                case 2 -> showStudentReport();
+                case 3 -> showBookReport();
+                case 4 -> showOverdueReport();
+                case 0 -> { return; }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    
+    private static void showLibraryStatistics() {
+        System.out.println("\n--- Library Statistics ---");
+        LibraryManager.LibraryStatistics stats = libraryManager.getLibraryStatistics();
+        System.out.println(stats);
+    }
+    
+    private static void showStudentReport() {
+        System.out.println("\n--- Student Report ---");
+        viewAllStudents();
+    }
+    
+    private static void showBookReport() {
+        System.out.println("\n--- Book Report ---");
+        viewAllBooks();
+    }
+    
+    private static void showOverdueReport() {
+        System.out.println("\n--- Overdue Report ---");
+        viewOverdueBooks();
+    }
+    
+    // Search System
+    private static void searchSystem() {
+        while (true) {
+            System.out.println("\n===== SEARCH SYSTEM =====");
+            System.out.println("1. Search Books");
+            System.out.println("2. Find Student");
+            System.out.println("3. Find Book by ID");
+            System.out.println("0. Back to Main Menu");
+            System.out.println("==========================");
+            
+            int choice = getIntInput("Enter your choice: ");
+            
+            switch (choice) {
+                case 1 -> searchBooks();
+                case 2 -> findStudent();
+                case 3 -> findBook();
+                case 0 -> { return; }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    
+    private static void searchBooks() {
+        System.out.println("\n--- Search Books ---");
+        System.out.print("Enter search keyword (title, author, or ISBN): ");
+        String keyword = scanner.nextLine();
+        
+        List<Book> results = libraryManager.searchBooks(keyword);
+        
+        if (results.isEmpty()) {
+            System.out.println("No books found matching the keyword: " + keyword);
+        } else {
+            System.out.println("Search results for: " + keyword);
+            System.out.printf("%-10s %-25s %-20s %-15s %-10s%n", 
+                            "ID", "Title", "Author", "ISBN", "Available");
+            System.out.println("=".repeat(85));
+            
+            for (Book book : results) {
+                System.out.printf("%-10s %-25s %-20s %-15s %-10s%n",
+                                book.getBookId(),
+                                truncate(book.getTitle(), 25),
+                                truncate(book.getAuthor(), 20),
+                                book.getIsbn(),
+                                book.getAvailableCopies() + "/" + book.getTotalCopies());
+            }
+        }
+    }
+    
+    private static void findStudent() {
+        System.out.println("\n--- Find Student ---");
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+        
+        Student student = libraryManager.getStudent(studentId);
+        if (student != null) {
+            System.out.println("Student found: " + student);
+        } else {
+            System.out.println("❌ Student not found.");
+        }
+    }
+    
+    private static void findBook() {
+        System.out.println("\n--- Find Book ---");
+        System.out.print("Enter Book ID: ");
+        String bookId = scanner.nextLine();
+        
+        Book book = libraryManager.getBook(bookId);
+        if (book != null) {
+            System.out.println("Book found: " + book);
+        } else {
+            System.out.println("❌ Book not found.");
+        }
+    }
+    
+    // Initialize some sample data for testing
+    private static void initializeSampleData() {
+        // Add sample students
+        libraryManager.addStudent("STU001", "Alice Johnson", "alice@email.com", "123 Main St", "555-0101");
+        libraryManager.addStudent("STU002", "Bob Smith", "bob@email.com", "456 Oak Ave", "555-0102");
+        libraryManager.addStudent("STU003", "Carol Davis", "carol@email.com", "789 Pine Rd", "555-0103");
+        
+        // Add sample books
+        libraryManager.addBook("BK001", "Java Programming", "John Doe", "978-0134685991", "Programming", 3);
+        libraryManager.addBook("BK002", "Database Systems", "Jane Smith", "978-0321197844", "Computer Science", 2);
+        libraryManager.addBook("BK003", "The Great Gatsby", "F. Scott Fitzgerald", "978-0743273565", "Literature", 5);
+        libraryManager.addBook("BK004", "To Kill a Mockingbird", "Harper Lee", "978-0061120084", "Literature", 4);
+        libraryManager.addBook("BK005", "1984", "George Orwell", "978-0451524935", "Fiction", 3);
+    }
+    
+    // Utility methods
+    private static int getIntInput(String prompt) {
+        while (true) {
             try {
-                double amount = Double.parseDouble(amountStr);
-                currentAccount.deposit(amount);
-                JOptionPane.showMessageDialog(this, 
-                    "Deposit Successful!\n" +
-                    "Amount Deposited: $" + String.format("%.2f", amount) + "\n" +
-                    "New Balance: $" + String.format("%.2f", currentAccount.getBalance()));
+                System.out.print(prompt);
+                String input = scanner.nextLine().trim();
+                return input.isEmpty() ? 0 : Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid amount!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println("Please enter a valid number.");
             }
         }
     }
     
-    private void changePin() {
-        String currentPin = JOptionPane.showInputDialog(this, "Enter current PIN:");
-        if (currentPin != null && currentPin.equals(currentAccount.getPin())) {
-            String newPin = JOptionPane.showInputDialog(this, "Enter new 4-digit PIN:");
-            if (newPin != null && newPin.length() == 4 && newPin.matches("\\d{4}")) {
-                currentAccount.setPin(newPin);
-                JOptionPane.showMessageDialog(this, "PIN changed successfully!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Please enter a valid 4-digit PIN!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (currentPin != null) {
-            JOptionPane.showMessageDialog(this, "Incorrect current PIN!", 
-                "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void fundTransfer() {
-        String targetAccount = JOptionPane.showInputDialog(this, "Enter target account number:");
-        if (targetAccount != null && !targetAccount.trim().isEmpty()) {
-            if (App.getAccounts().containsKey(targetAccount)) {
-                String amountStr = JOptionPane.showInputDialog(this, "Enter amount to transfer:");
-                if (amountStr != null && !amountStr.trim().isEmpty()) {
-                    try {
-                        double amount = Double.parseDouble(amountStr);
-                        if (currentAccount.withdraw(amount)) {
-                            Account targetAcc = App.getAccounts().get(targetAccount);
-                            targetAcc.deposit(amount);
-                            JOptionPane.showMessageDialog(this, 
-                                "Transfer Successful!\n" +
-                                "Amount Transferred: $" + String.format("%.2f", amount) + "\n" +
-                                "To Account: " + targetAccount + "\n" +
-                                "Remaining Balance: $" + String.format("%.2f", currentAccount.getBalance()));
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Insufficient balance or invalid amount!", 
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } catch (NumberFormatException e) {
-                        JOptionPane.showMessageDialog(this, "Please enter a valid amount!", 
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Target account not found!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-}
-
-class LoginFrame extends JFrame {
-    public LoginFrame() {
-        setTitle("ATM Login");
-        setSize(400, 250);
-        setLocationRelativeTo(null);
-        setLayout(new GridLayout(4, 2, 10, 10));
-        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        
-        JTextField accountField = new JTextField();
-        JPasswordField pinField = new JPasswordField();
-        
-        add(new JLabel("Account Number:"));
-        add(accountField);
-        add(new JLabel("PIN:"));
-        add(pinField);
-        add(new JLabel(""));
-        add(new JLabel(""));
-        
-        JButton loginBtn = new JButton("Login");
-        JButton cancelBtn = new JButton("Cancel");
-        
-        add(loginBtn);
-        add(cancelBtn);
-        
-        loginBtn.addActionListener(e -> {
-            String accountNumber = accountField.getText().trim();
-            String pin = new String(pinField.getPassword());
-            
-            Account account = App.getAccounts().get(accountNumber);
-            if (account != null && account.getPin().equals(pin)) {
-                App.setCurrentAccount(accountNumber);
-                dispose();
-                new ATMMenuFrame(account);
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid account number or PIN!", 
-                    "Login Failed", JOptionPane.ERROR_MESSAGE);
-                pinField.setText("");
-            }
-        });
-        
-        cancelBtn.addActionListener(e -> dispose());
-        
-        setVisible(true);
-    }
-}
-
-class ViewInfoFrame extends JFrame {
-    public ViewInfoFrame() {
-        setTitle("View Account Information");
-        setSize(400, 200);
-        setLocationRelativeTo(null);
-        setLayout(new GridLayout(3, 2, 10, 10));
-        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        
-        JTextField accountField = new JTextField();
-        
-        add(new JLabel("Account Number:"));
-        add(accountField);
-        add(new JLabel(""));
-        add(new JLabel(""));
-        
-        JButton viewBtn = new JButton("View Info");
-        JButton cancelBtn = new JButton("Cancel");
-        
-        add(viewBtn);
-        add(cancelBtn);
-        
-        viewBtn.addActionListener(e -> {
-            String accountNumber = accountField.getText().trim();
-            Account account = App.getAccounts().get(accountNumber);
-            
-            if (account != null) {
-                String info = "Account Information:\n\n" +
-                    "Account Number: " + account.getAccountNumber() + "\n" +
-                    "Name: " + account.getName() + "\n" +
-                    "Email: " + account.getEmail() + "\n" +
-                    "Mobile: " + account.getMobile() + "\n" +
-                    "Gender: " + account.getGender() + "\n" +
-                    "Address: " + account.getAddress() + "\n" +
-                    "DOB: " + account.getDob() + "\n" +
-                    "Account Type: " + account.getAccountType() + "\n" +
-                    "Marital Status: " + account.getMaritalStatus() + "\n" +
-                    "Balance: $" + String.format("%.2f", account.getBalance());
-                    
-                JOptionPane.showMessageDialog(this, info, "Account Information", 
-                    JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Account not found!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        
-        cancelBtn.addActionListener(e -> dispose());
-        
-        setVisible(true);
-    }
-}
-
-class CardDetailsFrame extends JFrame {
-    public CardDetailsFrame() {
-        setTitle("Card Details");
-        setSize(400, 200);
-        setLocationRelativeTo(null);
-        setLayout(new GridLayout(3, 2, 10, 10));
-        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        
-        JTextField accountField = new JTextField();
-        
-        add(new JLabel("Account Number:"));
-        add(accountField);
-        add(new JLabel(""));
-        add(new JLabel(""));
-        
-        JButton viewBtn = new JButton("View Card Details");
-        JButton cancelBtn = new JButton("Cancel");
-        
-        add(viewBtn);
-        add(cancelBtn);
-        
-        viewBtn.addActionListener(e -> {
-            String accountNumber = accountField.getText().trim();
-            Account account = App.getAccounts().get(accountNumber);
-            
-            if (account != null) {
-                Random rand = new Random();
-                String cardNumber = String.format("%04d-%04d-%04d-%04d", 
-                    rand.nextInt(10000), rand.nextInt(10000), 
-                    rand.nextInt(10000), rand.nextInt(10000));
-                String expiryDate = "12/" + (java.time.Year.now().getValue() + 5);
-                String cvv = String.format("%03d", rand.nextInt(1000));
-                
-                String cardInfo = "Card Details:\n\n" +
-                    "Card Number: " + cardNumber + "\n" +
-                    "Cardholder Name: " + account.getName().toUpperCase() + "\n" +
-                    "Expiry Date: " + expiryDate + "\n" +
-                    "CVV: " + cvv + "\n" +
-                    "Card Type: " + account.getAccountType() + " Card";
-                    
-                JOptionPane.showMessageDialog(this, cardInfo, "Card Details", 
-                    JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Account not found!", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        
-        cancelBtn.addActionListener(e -> dispose());
-        
-        setVisible(true);
+    private static String truncate(String str, int length) {
+        if (str == null) return "";
+        return str.length() <= length ? str : str.substring(0, length - 3) + "...";
     }
 }
